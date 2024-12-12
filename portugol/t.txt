@@ -1,0 +1,219 @@
+
+programa
+{
+	inclua biblioteca Graficos --> gr
+	inclua biblioteca Teclado --> te
+	inclua biblioteca Util --> ut
+	inclua biblioteca Tipos --> ti
+	const inteiro LARGURA = 600, ALTURA = 600 //tela
+
+	//menu init
+	inteiro start = 0
+
+     //player atributes
+	real x = 200.0, y = 200.0 //quadrado
+	real speed = 0.07
+	inteiro size = 40
+
+	//CENARIO PAREDES
+	inteiro lado = 20
+	//inteiro ladoHorizontal = 20
+
+	//POSICOES
+	inteiro CORA = gr.criar_cor(21, 10, 173)
+
+     //PLAYER INSTANCES
+	inteiro playerL = 0
+	inteiro playerR = 0
+	inteiro playerU = 0
+	inteiro playerD = 0
+	inteiro player = 0
+
+     			//HITBOX
+     			real direitoX = 240.0, direitoBaixoY = 240.0
+     			inteiro wallx = 300, wally = 300
+     
+     			inteiro bypass = 1
+	
+	funcao inicio()
+	{
+		construir_tela()
+	}//fecha inicio()
+	funcao construir_tela(){
+		gr.iniciar_modo_grafico(verdadeiro)
+		gr.definir_dimensoes_janela(LARGURA, ALTURA)
+		gr.definir_titulo_janela("Ciências da Computação | Console")
+		player = gr.carregar_imagem("C:\\Users\\Marcos Emanuel\\Downloads\\Original_PacMan_esquerda.png")
+		playerL = gr.carregar_imagem("C:\\Users\\Marcos Emanuel\\Downloads\\Original_PacMan_esquerda.png")
+		playerR = gr.carregar_imagem("C:\\Users\\Marcos Emanuel\\Downloads\\Original_PacMan_direita.png")
+		playerU = gr.carregar_imagem("C:\\Users\\Marcos Emanuel\\Downloads\\Original_PacMan_cima.png")
+		playerD = gr.carregar_imagem("C:\\Users\\Marcos Emanuel\\Downloads\\Original_PacMan_baixo.png")
+		player = gr.redimensionar_imagem(player, size, size, verdadeiro)
+		playerL = gr.redimensionar_imagem(playerL, size, size, verdadeiro)
+		playerR = gr.redimensionar_imagem(playerR, size, size, verdadeiro)
+		playerU = gr.redimensionar_imagem(playerU, size, size, verdadeiro)
+		playerD = gr.redimensionar_imagem(playerD, size, size, verdadeiro)
+		enquanto(verdadeiro){//mantem a tela ligada e limpa ela (atualiza para branco)
+			run() //roda o programa
+			
+		}
+	}//fecha construir_tela()
+
+
+	
+	funcao run(){
+		gr.definir_tamanho_texto(30.0)
+		se(start==0) {//SE NÃO INICIOU FAÇA:
+			gr.definir_cor(gr.COR_PRETO)//cor menu inicio
+			gr.limpar()//limpa para setar a cor
+			gr.definir_cor(CORA)
+			gr.desenhar_retangulo(LARGURA/2-(lado*7), ALTURA/2+lado*2, lado*14, lado*3, verdadeiro, verdadeiro)
+			gr.definir_cor(gr.COR_PRETO)
+			gr.desenhar_retangulo(LARGURA/2-(lado*6+lado/2), ALTURA/2+lado*2+lado/4, lado*13, lado*2+lado/2, verdadeiro, verdadeiro)
+			gr.definir_cor(gr.COR_AMARELO)
+			gr.desenhar_texto(LARGURA/2-(lado*5-lado/3), (ALTURA/2)+lado*3, "PRESS ENTER")
+			gr.definir_tamanho_texto(20.5)
+			gr.desenhar_imagem(LARGURA/4, ALTURA/4, playerR)
+			gr.definir_cor(gr.COR_BRANCO)
+			gr.desenhar_texto(LARGURA/4+lado*2+lado/2, ALTURA/3-lado*2, "PACMAN em PORTUGOL!")
+			gr.desenhar_texto(LARGURA-(lado*14), ALTURA-lado*2, "Por: Marcos E. @marc0s_ec")
+			
+
+		
+			gr.renderizar()//renderiza tudo
+		}
+		se(te.tecla_pressionada(te.TECLA_ENTER) e start == 0){//aperte ENTER para começar
+			start=1	//jogo iniciado
+		}//fecha se (enter para iniciar o jogo)
+		
+		se(start==1){ //""""""""""""""""""""""""""JOGO INICIADO
+			limpe() //reseta
+			criaTerreno() //cria as bordas
+			checkin() //checa a face e atualiza o sentido da velocidade
+			hitbox()//DESENHA CAIXA DE COLISÃO
+			drawCUBE() //desenha o player
+			gr.renderizar() //desenha toda a cena
+		}
+		
+	}//fecha run()--------------------------------------------------------------------
+
+
+
+
+
+	
+	funcao limpe(){
+		gr.definir_cor(gr.COR_BRANCO)
+		gr.limpar()
+	}//fecha limpar_Tela()
+	funcao criaTerreno() //PAREDES E TELEPORTE
+	{
+		gr.definir_cor(gr.COR_AZUL)
+
+		//cria areas de colisão, TESTE
+		gr.desenhar_retangulo(wallx, wally, lado*2, lado*2, falso, verdadeiro)
+
+		///
+		
+		/*DESENHA QUADRADO ESQUERDO DE BAIXO*/gr.desenhar_retangulo(lado, (ALTURA/2)+lado, lado*4+(lado/2), lado*2, falso, verdadeiro)
+		/*DESENHA QUADRADO ESQUERDO DE CIMA*/gr.desenhar_retangulo(lado, (ALTURA/2)-(lado*3), lado*4+(lado/2), lado*2, falso, verdadeiro)
+	     
+	     /*DESENHA QUADRADO DIREITO DE BAIXO*/gr.desenhar_retangulo(LARGURA-(lado*5)-lado/2, (ALTURA/2)+lado, lado*4+(lado/2), lado*2, falso, verdadeiro)
+		/*DESENHA QUADRADO DIREITO DE CIMA*/gr.desenhar_retangulo(LARGURA-(lado*5)-lado/2, (ALTURA/2)-(lado*3), lado*4+(lado/2), lado*2, falso, verdadeiro)
+
+
+
+		///////////////////////////////////////////////////////////////////////////////////////////////
+		//gr.desenhar_retangulo(x, y, largura, altura, arredondar_cantos, preencher)
+			gr.desenhar_retangulo(0, 0, lado, (ALTURA/2)-lado, falso, verdadeiro)
+			gr.desenhar_retangulo(0, (ALTURA/2)+lado, lado, (ALTURA/2)-(lado*2), falso, verdadeiro)
+		
+		gr.desenhar_retangulo(LARGURA-lado, 0, lado, (ALTURA/2)-lado, falso, verdadeiro)
+		gr.desenhar_retangulo(LARGURA-lado, (ALTURA/2)+lado, lado, (ALTURA/2)-(lado*2), falso, verdadeiro)
+
+		
+		//partes de cima e baixo
+			gr.desenhar_retangulo(0, 0, LARGURA, lado, falso, verdadeiro)
+			gr.desenhar_retangulo(0, ALTURA-lado, LARGURA, lado, falso, verdadeiro)
+          /////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+			
+	}//fecha criaTerreno()
+     funcao drawCUBE(){
+     	//gr.definir_cor(gr.COR_VERMELHO) //cor do quadrado
+     	//gr.desenhar_retangulo(x, y, 30, 30, falso, verdadeiro) //desenha o quadrado (pode ser uma imagem)
+     	gr.desenhar_imagem(x, y, player) //imagem
+     	
+     }//fecha drawCUBE()
+     funcao updateSpeed() //ATUALIZA O SENTIDO DA VELOCIDADE
+     {
+     	se(player==playerU){
+     		y = y - speed
+     	}
+     	se(player==playerD){
+     		y = y + speed
+     	}
+     	se(player==playerL){
+     		x = x - speed
+     	}
+     	se(player==playerR){
+     		x = x + speed
+     	}
+     	
+     }//fecha updateSpeed()
+     funcao checkin(){
+          //MOVIMENTAÇÃO E VELOCIDADE
+     	se(te.tecla_pressionada(te.TECLA_SETA_ACIMA) ou te.tecla_pressionada(te.TECLA_W)){ //CIMA
+     		player = playerU
+     	}//fecha SE - cima
+     	se(te.tecla_pressionada(te.TECLA_SETA_ABAIXO) ou te.tecla_pressionada(te.TECLA_S)){ //BAIXO
+     		player = playerD
+     	}//fecha SE - baixo
+     	se(te.tecla_pressionada(te.TECLA_SETA_ESQUERDA) ou te.tecla_pressionada(te.TECLA_A)){ //ESQUERDA
+     		player = playerL
+     	}//fecha SE - esquerda
+     	se(te.tecla_pressionada(te.TECLA_SETA_DIREITA) ou te.tecla_pressionada(te.TECLA_D)){ //DIREITA
+     		player = playerR
+     	}//fecha SE - direita
+     	
+     	updateSpeed() //APOS TER ALTERADO O VALOR DA FACE, ATUALIZA O SENTIDO DA VELOCIDADE
+     	
+     }//fecha checkin()
+     funcao hitbox(){
+     /*	direitoBaixoX = 240.0, direitoBaixoY = 240.0
+     	direitoCimaX = 200.0, direitoCimaY = 240.0
+     	esquerdaBaixoX = 200.0, esquerdaBaixoY = 240.0	*/
+     	direitoX = x+size
+     	direitoBaixoY = y+size
+     	
+ 
+     	se(bypass == 1) {
+     		gr.definir_cor(gr.COR_VERMELHO)
+     		gr.definir_tamanho_texto(28.0)
+     		gr.desenhar_texto(lado, lado*2+lado/2, "X: " + ti.inteiro_para_cadeia(ti.real_para_inteiro(x),10) + " Y: " + ti.inteiro_para_cadeia(ti.real_para_inteiro(y),10))
+     		gr.desenhar_retangulo(x, y, 2, 2, falso, verdadeiro)
+     		gr.definir_cor(gr.COR_VERDE)
+     		gr.desenhar_texto(lado, lado, "RX: " + ti.inteiro_para_cadeia(ti.real_para_inteiro(direitoX),10) + " DY: " + ti.inteiro_para_cadeia(ti.real_para_inteiro(direitoBaixoY),10))
+     		gr.desenhar_retangulo(direitoX, direitoBaixoY, 2, 2, falso, verdadeiro)
+     	}//fecha bypass
+     	
+     }//fecha hitbox
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
